@@ -119,7 +119,7 @@ namespace List
 
         private void DownSize()
         {
-            int newLenght = (int)(_array.Length / 1.33d + 1);
+            int newLenght = (int)(_array.Length * 0.67d + 1);
             T[] tempArray = new T[newLenght];
 
             for (int i = 0; i > _array.Length; i++)
