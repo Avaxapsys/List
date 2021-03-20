@@ -6,66 +6,102 @@ using System.Threading.Tasks;
 
 namespace List
 {
-    public class ArrayList<T>
+    public class ArrayList
     {
-        public int Lenght { get; private set; }
+        public int Length { get; private set; }
 
-        private T[] _array;
+        public int this[int index]
+        {
+            get
+            {
+                if (index >= Length || index < 0)
+                {
+                    throw new IndexOutOfRangeException();
+                }
+                return _array[index];
+            }
+            set
+            {
+                if (index >= Length || index < 0)
+                {
+                    throw new IndexOutOfRangeException();
+                }
+                _array[index] = value;
+            }
+        }
+
+        private int [] _array;
 
         public ArrayList()
         {
-            Lenght = 0;
+            Length = 0;
 
-            _array = new T[10];
+            _array = new int[10];
         }
 
-        public void Add(T value)
+        public ArrayList(int value)
         {
-            if(Lenght == _array.Length)
+            Length = 1;
+
+            _array = new int[10];
+            _array[0] = value;
+        }
+        public ArrayList(int [] value)
+        {
+            Length = value.Length;
+
+            _array = value;
+            UpSize();
+        }
+        public void Add(int value)
+        {
+            if(Length == _array.Length)
+            {
+                UpSize();
+                
+            }
+            _array[Length] = value;
+            Length++;
+        }
+
+        public void AddToBegin(int value)
+        {
+            if (Length == _array.Length)
             {
                 UpSize();
             }
-            _array[Lenght] = value;
-            Lenght++;
-        }
-
-        public void AddToBegin(T value)
-        {
-            if (Lenght == _array.Length)
+            for(int i = Length; i > 0; i--)
             {
-                UpSize();
-            }
-            for(int i = 0; i < Lenght; i++)
-            {
-                _array[i + 1] = _array[i];
+                _array[i] = _array[i-1];
             }
 
             _array[0] = value;
-            Lenght++;
+            Length++;
         }
 
-        public void AddByIndex(T value, int index)
+        public void AddByIndex(int value, int index)
         {
-            if (Lenght == _array.Length)
+            if (Length == _array.Length)
             {
                 UpSize();
             }
-            Lenght++;
-            for (int i = Lenght; i > index; i--)
+            
+            for (int i = Length; i > index; i--)
             {
                 _array[i] = _array[i - 1];
             }
             _array[index] = value;
+            Length++;
         }
 
-        public void Remove(T value)
+        public void Remove()
         {
-            if (Lenght == 0)
+            if (Length == 0)
             {
                 throw new ArgumentNullException("The list is already empty");
             }
-            Lenght--;
-            if (Lenght < _array.Length / 2)
+            Length--;
+            if (Length < _array.Length / 2)
             {
                 DownSize();
             }
@@ -73,17 +109,17 @@ namespace List
 
         public void RemoveFromBegin()
         {
-            if (Lenght == 0)
+            if (Length == 0)
             {
                 throw new ArgumentNullException("The list is already empty");
             }
 
-            for(int i = 0; i < Lenght; i++)
+            for(int i = 0; i < Length; i++)
             {
                 _array[i] = _array[i + 1]; 
             }
-            Lenght--;
-            if (Lenght < _array.Length / 2)
+            Length--;
+            if (Length < _array.Length / 2)
             {
                 DownSize();
             }
@@ -91,42 +127,123 @@ namespace List
 
         public void RemoveByIndex(int index)
         {
-            if (index < 0 || index > Lenght)
+            if (index < 0 || index > Length)
             {
-                throw new IndexOutOfRangeException("Index < 0 or more list lenght");
+                throw new IndexOutOfRangeException("Index < 0 or more list Length");
             }
-            for (int i = index; i < Lenght; i++)
+            for (int i = index; i < Length; i++)
             {
                 _array[index] = _array[index + 1];
             }
-            Lenght--;
-            if (Lenght < _array.Length / 2)
+            Length--;
+            if (Length < _array.Length / 2)
             {
                 DownSize();
             }
         }
 
+        public void RemoveMultyElements(int count)
+        {
+            if (Length < count)
+            {
+                throw new IndexOutOfRangeException("The list is already empty");
+            }
+
+            Length -= count;
+            if (Length < _array.Length / 2)
+            {
+                DownSize();
+            }
+        }
+
+        public void RemoveFromBeginMultyElements (int count)
+        {
+            if (Length < count)
+            {
+                throw new IndexOutOfRangeException("The list is less than expected");
+            }
+
+            for (int i = 0; i < Length - count; i++)
+            {
+                _array[i] = _array[i + count];
+            }
+            Length -= count;
+            if (Length < _array.Length / 2)
+            {
+                DownSize();
+            }
+        }
+
+        public void RemoveByIndexMultyElements (int count, int index)
+        {
+            if (Length < count + index)
+            {
+                throw new IndexOutOfRangeException("The list is less than expected");
+            }
+
+            for (int i = index; i < Length; i++)
+            {
+                _array[i] = _array[i + count];
+            }
+            Length -= count;
+            if (Length < _array.Length / 2)
+            {
+                DownSize();
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            ArrayList arrayList = (ArrayList)obj;
+
+            if (this.Length != arrayList.Length)
+            {
+                return false;
+            }
+            for (int i = 0; i < Length; i++)
+            {
+                if (this._array[i] != arrayList._array[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public override string ToString()
+        {
+            string str = "";
+            for(int i = 0; i < _array.Length; i++)
+            {
+                str += _array[i] + " ";
+            }
+            return str;
+        }
+
+
         private void UpSize()
         {
-            int newLenght = (int)(_array.Length * 1.33d + 1);
-            T[] tempArray = new T[newLenght];
+            int newLength = (int)(_array.Length * 1.33d + 1);
+            int[] tempArray = new int[newLength];
 
-            for (int i = 0; i > _array.Length; i++)
+            for (int i = 0; i < _array.Length; i++)
             {
                 tempArray[i] = _array[i];
             }
+            _array = tempArray;
         }
 
         private void DownSize()
         {
-            int newLenght = (int)(_array.Length * 0.67d + 1);
-            T[] tempArray = new T[newLenght];
+            int newLength = (int)(_array.Length * 0.67d + 1);
+            int[] tempArray = new int[newLength];
 
-            for (int i = 0; i > _array.Length; i++)
+            for (int i = 0; i < _array.Length; i++)
             {
                 tempArray[i] = _array[i];
             }
-        }
 
+            _array = tempArray;
+        }
     }
 }
