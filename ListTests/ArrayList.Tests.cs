@@ -77,7 +77,7 @@ namespace ListTests
             Assert.AreEqual(expected, actual);
         }
 
-        [TestCase(1, 2, new int[] { 1, 2, 3, 4, 5 }, new int[] { 1, 2, 4, 5})]
+        [TestCase(1, 2, new int[] { 1, 2, 3, 4, 5}, new int[] { 1, 2, 4, 5})]
         public void RemoveByIndexMultyElementsTest(int a, int b, int[] actualArray, int[] expectedArray)
         {
             ArrayList expected = new ArrayList(expectedArray);
