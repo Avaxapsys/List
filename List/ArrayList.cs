@@ -20,14 +20,6 @@ namespace List
                 }
                 return _array[index];
             }
-            set
-            {
-                if (index >= Length || index < 0)
-                {
-                    throw new IndexOutOfRangeException();
-                }
-                _array[index] = value;
-            }
         }
 
         private int [] _array;
@@ -51,7 +43,7 @@ namespace List
             Length = value.Length;
 
             _array = value;
-            UpSize();
+
         }
         public void Add(int value)
         {
@@ -113,8 +105,7 @@ namespace List
             {
                 throw new ArgumentNullException("The list is already empty");
             }
-
-            for(int i = 0; i < Length; i++)
+            for(int i = 0; i < Length - 1; i++)
             {
                 _array[i] = _array[i + 1]; 
             }
@@ -180,8 +171,7 @@ namespace List
             {
                 throw new IndexOutOfRangeException("The list is less than expected");
             }
-
-            for (int i = index; i < Length; i++)
+            for (int i = index; i < Length - 1; i++)
             {
                 _array[i] = _array[i + count];
             }
@@ -190,6 +180,120 @@ namespace List
             {
                 DownSize();
             }
+        }
+
+        public int GetFirstIndexByValue(int value)
+        {
+            int result = 0;
+            for(int i = 0; i < Length; i++)
+            {
+                if(_array[i] == value)
+                {
+                    result = i;
+                    return result;
+                }
+            }
+            if (result == 0)
+            {
+                throw new ArgumentException($"List does not have argumet {value}");
+            }
+            return result;
+        }
+
+        public void SetValueByIndex(int value, int index)
+        {
+            if (Length < index)
+            {
+                throw new IndexOutOfRangeException("The list length is less than index");
+            }
+            _array[index] = value;
+        }
+
+        public void RevertList()
+        {
+            if( Length <= 1)
+            {
+                throw new ArgumentException("The list is empty or contains only one element");
+            }
+            //_array.Reverse();
+            int cursor = Length - 1;
+            for (int i = 0; i < cursor; i++)
+            {
+                int tempValue = _array[i];
+                _array[i] = _array[cursor];
+                _array[cursor] = tempValue;
+                cursor--;
+            }
+        }
+
+        public int GetMaxValue()
+        {
+            if (Length == 0)
+            {
+                throw new ArgumentNullException("The list is empty");
+            }
+
+            int max = 0;
+            for (int i = 0; i <= Length - 1; i++)
+            {
+                if (max < _array[i])
+                {
+                    max = _array[i];
+                }
+            }
+            return max;
+        }
+
+        public int GetMinValue()
+        {
+            if (Length == 0)
+            {
+                throw new ArgumentNullException("The list is empty");
+            }
+
+            int min = _array[0];
+            for (int i = 0; i <= Length - 1; i++)
+            {
+                if (min > _array[i])
+                {
+                    min = _array[i];
+                }
+            }
+            return min;
+        }
+
+        public int GetFirstIndexOfMaxValue()
+        {
+            if (Length == 0)
+            {
+                throw new ArgumentNullException("The list is empty");
+            }
+            int index = 0;
+            for(int i = 1; i < Length; i++)
+            {
+                if(_array[i] > _array[index])
+                {
+                    index = i;
+                }
+            }
+            return index;
+        }
+
+        public int GetFirstIndexOfMinValue()
+        {
+            if (Length == 0)
+            {
+                throw new ArgumentNullException("The list is empty");
+            }
+            int index = 0;
+            for (int i = 1; i < Length; i++)
+            {
+                if (_array[i] < _array[index])
+                {
+                    index = i;
+                }
+            }
+            return index;
         }
 
         public override bool Equals(object obj)
@@ -245,5 +349,17 @@ namespace List
 
             _array = tempArray;
         }
+
+        //private void ActualSize()
+        //{
+        //    Length = _array.Length;
+        //    int[] tempArray = new int[Length];
+        //    for (int i = 0; i < Length; i++)
+        //    {
+        //        tempArray[i] = _array[i];
+        //    }
+
+        //    _array = tempArray;
+        //}
     }
 }
