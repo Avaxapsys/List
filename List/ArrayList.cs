@@ -40,8 +40,11 @@ namespace List
         }
         public ArrayList(int [] value)
         {
+            if (value.Length == 0)
+            {
+                throw new ArgumentNullException("List shouldn't be empty in this way, try with another constructor");
+            }
             Length = value.Length;
-
             _array = value;
 
         }
@@ -56,34 +59,53 @@ namespace List
             Length++;
         }
 
+        public void Add(ArrayList list)
+        {
+            SetList(list, Length);
+        }
+
         public void AddToBegin(int value)
         {
             if (Length == _array.Length)
             {
                 UpSize();
             }
-            for(int i = Length; i > 0; i--)
-            {
-                _array[i] = _array[i-1];
-            }
-
-            _array[0] = value;
             Length++;
+            MoveRight(0, 1);
+            _array[0] = value;
+            
+        }
+
+        public void AddToBegin(ArrayList list)
+        {
+            SetList(list);
         }
 
         public void AddByIndex(int value, int index)
         {
+            if (index < 0 || index > Length)
+            {
+                throw new IndexOutOfRangeException($"The length of list is less than {index} or index ");
+            }
+
             if (Length == _array.Length)
             {
                 UpSize();
             }
-            
-            for (int i = Length; i > index; i--)
-            {
-                _array[i] = _array[i - 1];
-            }
-            _array[index] = value;
+
             Length++;
+            MoveRight(index, 1);
+            _array[index] = value;
+        }
+
+        public void AddByIndex(ArrayList list, int index)
+        {
+            if(index > Length)
+            {
+                throw new IndexOutOfRangeException($"The length of list is less than index");
+            }
+
+            SetList(list, index);
         }
 
         public void Remove()
@@ -116,18 +138,32 @@ namespace List
             }
         }
 
-        public void RemoveByIndex(int index)
+        public void RemoveByIndex(int index, int number = 1)
         {
             if (index < 0 || index > Length)
             {
                 throw new IndexOutOfRangeException("Index < 0 or more list Length");
             }
-            for (int i = index; i < Length; i++)
+
+            if (number < 0)
             {
-                _array[index] = _array[index + 1];
+                throw new ArgumentException();
             }
-            Length--;
-            if (Length < _array.Length / 2)
+
+            if (number >= Length - index)
+            {
+                Length -= Length - index;
+            }
+            else
+            {
+                for (int i = index; i + number < Length; i++)
+                {
+                    _array[i] = _array[i + number];
+                }
+                Length -= number;
+
+            }
+            if (Length <= (int)(_array.Length * 0.67 + 1))
             {
                 DownSize();
             }
@@ -296,6 +332,108 @@ namespace List
             return index;
         }
 
+        public void UpSort()
+        {
+            if (Length == 0)
+            {
+                throw new ArgumentNullException("The list is empty");
+            }
+            // InsertSort
+            for (int i = 1; i < Length; i++)
+            {
+                int value = _array[i];
+                int position = i;
+
+                while (position > 0 && _array[position - 1] > value)
+                {
+                    _array[position] = _array[position - 1];
+                    position--;
+                }
+                _array[position] = value;
+            }
+        }
+
+        public void DownSort()
+        {
+            if (Length == 0)
+            {
+                throw new ArgumentNullException("The list is empty");
+            }
+            // SelectionSort
+            for (int i = 0; i < Length; i++)
+            {
+                int iMin = i;
+                for (int j = i + 1; j < Length; j++)
+                {
+                    if (_array[j] > _array[iMin])
+                    {
+                        iMin = j;
+                    }
+                }
+
+                int minValue = _array[iMin];
+                _array[iMin] = _array[i];
+                _array[i] = minValue;
+            }
+        }
+
+        public int RemoveFirstByValue(int value)
+        {
+            if (Length == 0)
+            {
+                throw new ArgumentNullException("The list is empty");
+            }
+            int index = -1;
+            for (int i =0; i < Length; i++)
+            {
+                if (_array[i] == value)
+                {
+                    index = i;
+                    RemoveByIndex(i);
+                    break;
+                }
+            }
+            return index;
+        }
+
+        public int RemoveAllByValue(int value)
+        {
+            if (Length == 0)
+            {
+                throw new ArgumentNullException("The list is empty");
+            }
+            int count = 0;
+            for (int i = 0; i < Length; i++)
+            {
+                if (_array[i] == value)
+                {
+                    RemoveByIndex(i);
+                    i--;
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        private void SetList(ArrayList list, int index = 0)
+        {
+            Length += list.Length;
+            UpSize(list.Length);
+
+            if(index < Length)
+            {
+                MoveRight(index, list.Length);
+            }
+
+            int j = 0;
+            for (int i = index; i < index + list.Length; i++)
+            {
+                _array[i] = list[j];
+                j++;
+            }
+        }
+
+
         public override bool Equals(object obj)
         {
             ArrayList arrayList = (ArrayList)obj;
@@ -325,9 +463,9 @@ namespace List
         }
 
 
-        private void UpSize()
+        private void UpSize(int cell = 0)
         {
-            int newLength = (int)(_array.Length * 1.33d + 1);
+            int newLength = (int)(_array.Length * 1.33d + 1 + cell);
             int[] tempArray = new int[newLength];
 
             for (int i = 0; i < _array.Length; i++)
@@ -342,7 +480,7 @@ namespace List
             int newLength = (int)(_array.Length * 0.67d + 1);
             int[] tempArray = new int[newLength];
 
-            for (int i = 0; i < _array.Length; i++)
+            for (int i = 0; i < Length; i++)
             {
                 tempArray[i] = _array[i];
             }
@@ -350,16 +488,41 @@ namespace List
             _array = tempArray;
         }
 
-        //private void ActualSize()
-        //{
-        //    Length = _array.Length;
-        //    int[] tempArray = new int[Length];
-        //    for (int i = 0; i < Length; i++)
-        //    {
-        //        tempArray[i] = _array[i];
-        //    }
+        private void MoveRight(int start, int cells)
+        {
+            if (start >= Length || start < 0)
+            {
+                throw new IndexOutOfRangeException();
+            }
 
-        //    _array = tempArray;
-        //}
+            if (cells < 0)
+            {
+                throw new ArgumentException();
+            }
+
+            for (int i = Length - 1; i >= start + cells; i--)
+            {
+                _array[i] = _array[i - cells];
+            }
+        }
+
+        private void MoveLeft(int start, int cells)
+        {
+            if (start >= Length || start < 0)
+            {
+                throw new IndexOutOfRangeException();
+            }
+
+            if (cells < 0)
+            {
+                throw new ArgumentException();
+            }
+
+            for (int i = start; i < Length; i++)
+            {
+                _array[i] = _array[i + cells];
+            }
+        }
+
     }
 }

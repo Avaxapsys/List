@@ -6,29 +6,59 @@ namespace ListTests
     class ArrayListTests
     {
         [TestCase(5781, new int[] { 1, 2, 3 }, new int[] { 1, 2, 3, 5781 })]
-        public void AddTest(int a, int[] actualArray, int[] expectedArray)
+        public void AddTest(int value, int[] actualArray, int[] expectedArray)
         {
             ArrayList expected = new ArrayList(expectedArray);
             ArrayList actual = new ArrayList(actualArray);
-            actual.Add(a);
+            actual.Add(value);
             Assert.AreEqual(actual, expected);
         }
 
+        [TestCase(new int[] { 1, 2 }, new int[] { 3, 4, 5 }, new int[] { 1, 2, 3, 4, 5 })]
+        public void AddTest(int[] actualArray, int[] nextArray, int[] expectedArray)
+        {
+            ArrayList actual = new ArrayList(actualArray);
+            ArrayList next = new ArrayList(nextArray);
+            ArrayList expected = new ArrayList(expectedArray);
+            actual.Add(next);
+            Assert.AreEqual(expected, actual);
+        }
+
         [TestCase(5781, new int[] { 1, 2, 3 }, new int[] { 5781, 1, 2, 3 })]
-        public void AddToBeginTest(int a, int [] actualArray, int[] expectedArray)
+        public void AddToBeginTest(int value, int [] actualArray, int[] expectedArray)
         {
             ArrayList expected = new ArrayList(expectedArray);
             ArrayList actual = new ArrayList(actualArray);
-            actual.AddToBegin(a);
+            actual.AddToBegin(value);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestCase(new int[] { 3, 4, 5 }, new int[] { 1, 2 }, new int[] { 1, 2, 3, 4, 5 })]
+        public void AddToBeginTest(int[] actualArray, int[] nextArray, int[] expectedArray)
+        {
+            ArrayList actual = new ArrayList(actualArray);
+            ArrayList next = new ArrayList(nextArray);
+            ArrayList expected = new ArrayList(expectedArray);
+            actual.AddToBegin(next);
             Assert.AreEqual(expected, actual);
         }
 
         [TestCase(5781, 2, new int[] { 1, 2, 3 }, new int[] { 1, 2,5781, 3 })]
-        public void AddByIndexTest(int a, int b, int[] actualArray, int[] expectedArray)
+        public void AddByIndexTest(int value, int index, int[] actualArray, int[] expectedArray)
         {
             ArrayList expected = new ArrayList(expectedArray);
             ArrayList actual = new ArrayList(actualArray);
-            actual.AddByIndex(a,b);
+            actual.AddByIndex(value, index);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestCase(1, new int[] { 1, 4 }, new int[] { 2, 3 }, new int[] { 1, 2, 3, 4 })]
+        public void AddByIndexTest(int index, int[] actualArray, int[] nextArray, int[] expectedArray)
+        {
+            ArrayList actual = new ArrayList(actualArray);
+            ArrayList next = new ArrayList(nextArray);
+            ArrayList expected = new ArrayList(expectedArray);
+            actual.AddByIndex(next, index);
             Assert.AreEqual(expected, actual);
         }
 
@@ -51,6 +81,7 @@ namespace ListTests
         }
 
         [TestCase(1, new int[] { 1, 2, 3 }, new int[] { 1, 3 })]
+        [TestCase(2, new int[] { 1, 2, 3 }, new int[] { 1, 2 })]
         public void RemoveByIndexTest(int a, int[] actualArray, int[] expectedArray)
         {
             ArrayList expected = new ArrayList(expectedArray);
@@ -145,5 +176,42 @@ namespace ListTests
             int actual = actualArray.GetFirstIndexOfMinValue();
             Assert.AreEqual(expected, actual);
         }
+
+        [TestCase(new int[] { 5, 4, 3, 2, 1 }, new int[] { 1, 2, 3, 4, 5 })]
+        public void UpSortTest(int[] actualArray, int[] expectedArray)
+        {
+            ArrayList expected = new ArrayList(expectedArray);
+            ArrayList actual = new ArrayList(actualArray);
+            actual.UpSort();
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestCase(new int[] { 1, 2, 3, 4, 5 }, new int[] { 5, 4, 3, 2, 1 })]
+        public void DownSortTest(int[] actualArray, int[] expectedArray)
+        {
+            ArrayList expected = new ArrayList(expectedArray);
+            ArrayList actual = new ArrayList(actualArray);
+            actual.DownSort();
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestCase(3, 2, new int[] { 1, 2, 3 }, new int[] {1, 2 })]
+        public void RemoveFirstByValueTest(int value, int expected, int[] actualArrayInput, int [] expectedArrayInput)
+        {
+            ArrayList actualArray = new ArrayList(actualArrayInput);
+            int actual = actualArray.RemoveFirstByValue(value);
+            ArrayList expectrdArray = new ArrayList(expectedArrayInput);
+            Assert.AreEqual(expectrdArray, actualArray);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestCase(3, 3, new int[] { 1, 2, 3, 3, 3 }, new int[] { 1, 2 })]
+        public void RemoveAllByValueTest(int value, int expected, int[] actualArrayInput, int[] expectedArrayInput)
+        {
+            ArrayList actualArray = new ArrayList(actualArrayInput);
+            int actual = actualArray.RemoveAllByValue(value);
+            Assert.AreEqual(expected, actual);
+        }
+
     }
 }
