@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace List
 {
-    public class ArrayList
+    public class ArrayList: IList
     {
         public int Length { get; private set; }
 
@@ -50,7 +51,7 @@ namespace List
         }
         public void Add(int value)
         {
-            if(Length == _array.Length)
+            if (Length == _array.Length)
             {
                 UpSize();
                 
@@ -59,8 +60,13 @@ namespace List
             Length++;
         }
 
-        public void Add(ArrayList list)
+        public void Add(IList inputList)
         {
+            ArrayList list = new ArrayList();
+            if (inputList is ArrayList)
+            {
+                list = (ArrayList)inputList;
+            }
             SetList(list, Length);
         }
 
@@ -76,8 +82,13 @@ namespace List
             
         }
 
-        public void AddToBegin(ArrayList list)
+        public void AddToBegin(IList inputList)
         {
+            ArrayList list = new ArrayList();
+            if (inputList is ArrayList)
+            {
+                list = (ArrayList)inputList;
+            }
             SetList(list);
         }
 
@@ -98,13 +109,17 @@ namespace List
             _array[index] = value;
         }
 
-        public void AddByIndex(ArrayList list, int index)
+        public void AddByIndex(IList inputList, int index)
         {
             if(index > Length)
             {
                 throw new IndexOutOfRangeException($"The length of list is less than index");
             }
-
+            ArrayList list = new ArrayList();
+            if (inputList is ArrayList)
+            {
+                list = (ArrayList)inputList;
+            }
             SetList(list, index);
         }
 
@@ -183,31 +198,14 @@ namespace List
             }
         }
 
-        public void RemoveFromBeginMultyElements (int count)
-        {
-            if (Length < count)
-            {
-                throw new IndexOutOfRangeException("The list is less than expected");
-            }
 
-            for (int i = 0; i < Length - count; i++)
-            {
-                _array[i] = _array[i + count];
-            }
-            Length -= count;
-            if (Length < _array.Length / 2)
-            {
-                DownSize();
-            }
-        }
-
-        public void RemoveByIndexMultyElements (int count, int index)
+        public void RemoveByIndexMultyElements (int count, int index = 0)
         {
             if (Length < count + index)
             {
                 throw new IndexOutOfRangeException("The list is less than expected");
             }
-            for (int i = index; i < Length - 1; i++)
+            for (int i = index; i < Length - count; i++)
             {
                 _array[i] = _array[i + count];
             }
@@ -415,8 +413,13 @@ namespace List
             return count;
         }
 
-        private void SetList(ArrayList list, int index = 0)
+        private void SetList(IList inputList, int index = 0)
         {
+            ArrayList list = new ArrayList();
+            if (inputList is ArrayList)
+            {
+                list = (ArrayList)inputList;
+            }
             Length += list.Length;
             UpSize(list.Length);
 
